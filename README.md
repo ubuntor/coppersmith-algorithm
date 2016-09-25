@@ -3,7 +3,7 @@ Implements Coron's reformulation of Coppersmith's algorithm for finding small in
 
 Paper: http://www.jscoron.fr/publications/bivariate.pdf
 
-Used in CSAW Quals 2016 to solve Still Broken Box. (BTW, if you want an implementation of a crypto algorithm, write a crypto CTF challenge that needs it and read writeups.)
+Used in CSAW CTF Quals 2016 to solve Still Broken Box. (BTW, if you want an implementation of a crypto algorithm, write a crypto CTF challenge that needs it and read writeups.)
 
 **Warning: CTF Quality Code!**
 
