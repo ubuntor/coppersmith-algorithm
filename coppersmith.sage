@@ -9,6 +9,9 @@ def coron(pol, X, Y, k=2):
     k: Determines size of lattice. Increase if this fails.
     """
 
+    if pol.nvariables() != 2:
+        raise ValueError("pol is not bivariate")
+
     if pol(0,0) == 0:
         raise ValueError("pol(0,0) == 0 not supported (yet)")
 
@@ -22,7 +25,7 @@ def coron(pol, X, Y, k=2):
     coeffs = [pol.monomial_coefficient(P(1)), pol.monomial_coefficient(x),
               pol.monomial_coefficient(y), pol.monomial_coefficient(x*y)]
 
-    assert gcd(coeffs) == 1
+    assert gcd(pol.coefficients()) == 1
     W = abs(coeffs[-1])*X*Y
     assert gcd(coeffs[0],X*Y) == 1
     u = W + ((1-W) % abs(coeffs[0]))
