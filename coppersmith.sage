@@ -109,7 +109,7 @@ def main():
     # Recovery starts here
     q0 = (n * inverse_mod(p0,ln)) % ln
     assert q0 == q % ln
-    X = Y = next_prime(2^(nbits+1-lbits), proof=False) # bounds on p and q
+    X = Y = next_prime(2^(nbits+1-lbits), proof=False) # bounds on x0 and y0
 
     P.<x,y> = PolynomialRing(ZZ)
     pol = (ln*x+p0)*(ln*y+q0) - n # Should have a root at (x0,y0)
