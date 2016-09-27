@@ -111,7 +111,9 @@ def coron(pol, X, Y, k=2, debug=False):
     return (-1,-1)
 
 def main():
-    # Example: recover p,q prime given n=pq and the lower bits of p
+    # Example 1: recover p,q prime given n=pq and the lower bits of p
+
+    print "---EXAMPLE 1---"
 
     nbits = 512 # bitlength of primes
     p = random_prime(2^nbits-1, proof=False, lbound=2^(nbits-1))
@@ -146,6 +148,50 @@ def main():
     x0_2, y0_2 = coron(pol, X, Y, k=2, debug=True)
     p_2 = x0_2*ln + p0
     q_2 = y0_2*ln + q0
+
+    print
+    print 'Recovered:'
+    print 'x0 =',x0_2
+    print 'y0 =',y0_2
+    print 'p =',p_2
+    print 'q =',q_2
+
+    # Example 2: recover p,q prime given n=pq and the upper bits of p
+    # This can be done with a univariate polynomial and Howgrave-Graham,
+    # but this is another way to do it with a bivariate polynomial.
+
+    print "---EXAMPLE 2---"
+
+    nbits = 512 # bitlength of primes
+    p = random_prime(2^nbits-1, proof=False, lbound=2^(nbits-1))
+    q = random_prime(2^nbits-1, proof=False, lbound=2^(nbits-1))
+    n = p*q
+
+    lbits = (512-300) # number of masked bits of p
+    ln = 2^lbits
+    p0 = p // ln
+
+    x0 = p % ln # lower bits of p
+    y0 = q % ln # lower bits of q
+
+    print 'p =',p
+    print 'q =',q
+
+    print
+    print 'Given:'
+    print 'n =',n
+    print 'p0 =',p0
+
+    # Recovery starts here
+    q0 = floor(n / (p0*ln))//ln
+    X = Y = next_prime(2^(lbits+2), proof=False) # bounds on x0 and y0
+    P.<x,y> = PolynomialRing(ZZ)
+    # Should have a root at (x0,y0) +/- some bits of q0
+    pol = (x+p0*ln)*(y+q0*ln) - n
+
+    x0_2, y0_2 = coron(pol, X, Y, k=2, debug=True)
+    p_2 = p0*ln + x0_2
+    q_2 = q0*ln + y0_2
 
     print
     print 'Recovered:'
