@@ -52,32 +52,31 @@ def coron(pol, X, Y, k=2, debug=False):
     p00inv = inverse_mod(p00,N)
     polq = P(sum((i*p00inv % N)*j for i,j in zip(pol.coefficients(),
                                                  pol.monomials())))
-    polqq = {}
-    for i in range(k+1):
-        for j in range(k+1):
-            polqq[(i,j)] = polq*x^i*y^j*X^(k-i)*Y^(k-j)
+    polynomials = []
     for i in range(delta+k+1):
         for j in range(delta+k+1):
             if 0 <= i <= k and 0 <= j <= k:
-                continue
-            polqq[(i,j)] = x^i*y^j*N
+                polynomials.append(polq*x^i*y^j*X^(k-i)*Y^(k-j))
+            else:
+                polynomials.append(x^i * y^j * N)
 
+    # Make list of monomials for matrix indices
     monomials = []
-    for i in polqq:
-        for j in polqq[i].monomials():
+    for i in polynomials:
+        for j in i.monomials():
             if j not in monomials:
                 monomials.append(j)
     monomials.sort()
 
     # Construct lattice spanned by polynomials with xX and yY
     L = matrix(ZZ,len(monomials))
-    polqqq = list(polqq.values())
-    polqqq.sort()
     for i in range(len(monomials)):
         for j in range(len(monomials)):
-            L[i,j] = polqqq[i](X*x,Y*y).monomial_coefficient(monomials[j])
+            L[i,j] = polynomials[i](X*x,Y*y).monomial_coefficient(monomials[j])
 
-    L = matrix(ZZ,sorted(L,reverse=True)) # makes matrix upper triangular
+    # makes lattice upper triangular
+    # probably not needed, but it makes debug output pretty
+    L = matrix(ZZ,sorted(L,reverse=True))
 
     if debug:
         print "Bitlengths of matrix elements (before reduction):"
@@ -90,17 +89,16 @@ def coron(pol, X, Y, k=2, debug=False):
         print L.apply_map(lambda x: x.nbits()).str()
 
     roots = []
+    P2.<z> = PolynomialRing(ZZ)
 
     for i in range(L.nrows()):
         if debug:
             print "Trying row %d" % i
 
-        pol1 = pol
         # i'th row converted to polynomial dividing out X and Y
         pol2 = P(sum(map(mul, zip(L[i],monomials)))(x/X,y/Y))
 
-        P2.<z> = PolynomialRing(ZZ)
-        r = pol1.resultant(pol2, y)
+        r = pol.resultant(pol2, y)
 
         if r.is_constant(): # not independent
             continue
