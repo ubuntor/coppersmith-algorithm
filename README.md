@@ -5,7 +5,7 @@ Paper: http://www.jscoron.fr/publications/bivariate.pdf
 
 Used in CSAW CTF Quals 2016 to solve Still Broken Box. (BTW, if you want an implementation of a crypto algorithm, write a crypto CTF challenge that needs it and read writeups.)
 
-**Warning: CTF Quality Code!**
+~~**Warning: CTF Quality Code!**~~ Should be much more readable now.
 
 ## Why?
 Why not?
