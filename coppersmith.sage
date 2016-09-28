@@ -1,6 +1,6 @@
 def coron(pol, X, Y, k=2, debug=False):
     """
-    Returns a small root of pol.
+    Returns all small roots of pol.
 
     Applies Coron's reformulation of Coppersmith's algorithm for finding small
     integer roots of bivariate polynomials modulo an integer.
@@ -13,8 +13,7 @@ def coron(pol, X, Y, k=2, debug=False):
         debug: Turn on for debug print stuff.
 
     Returns:
-        (x0,y0) if the algorithm successfully finds a small root (x0,y0).
-        (-1,-1) if the algorithm fails.
+        A list of successfully found roots (x0,y0).
 
     Raises:
         ValueError: If pol is not bivariate, pol(0,0) == 0, or
@@ -83,6 +82,8 @@ def coron(pol, X, Y, k=2, debug=False):
         print "Bitlengths of matrix elements (after reduction):"
         print L.apply_map(lambda x: x.nbits()).str()
 
+    roots = []
+
     for i in range(L.nrows()):
         if debug:
             print "Trying row %d" % i
@@ -106,9 +107,9 @@ def coron(pol, X, Y, k=2, debug=False):
                 for y0, _ in P2(pol(x0,z)).roots():
                     if debug:
                         print "Potential y0:",y0
-                    if pol(x0,y0) == 0:
-                        return (x0,y0)
-    return (-1,-1)
+                    if (x0,y0) not in roots and pol(x0,y0) == 0:
+                        roots.append((x0,y0))
+    return roots
 
 def main():
     # Example 1: recover p,q prime given n=pq and the lower bits of p
@@ -145,7 +146,7 @@ def main():
     P.<x,y> = PolynomialRing(ZZ)
     pol = (ln*x+p0)*(ln*y+q0) - n # Should have a root at (x0,y0)
 
-    x0_2, y0_2 = coron(pol, X, Y, k=2, debug=True)
+    x0_2, y0_2 = coron(pol, X, Y, k=2, debug=True)[0]
     p_2 = x0_2*ln + p0
     q_2 = y0_2*ln + q0
 
@@ -189,7 +190,7 @@ def main():
     # Should have a root at (x0,y0) +/- some bits of q0
     pol = (x+p0*ln)*(y+q0*ln) - n
 
-    x0_2, y0_2 = coron(pol, X, Y, k=2, debug=True)
+    x0_2, y0_2 = coron(pol, X, Y, k=2, debug=True)[0]
     p_2 = p0*ln + x0_2
     q_2 = q0*ln + y0_2
 
