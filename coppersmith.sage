@@ -13,29 +13,36 @@ def coron(pol, X, Y, k=2, debug=False):
         debug: Turn on for debug print stuff.
 
     Returns:
-        A list of successfully found roots (x0,y0).
+        A list of successfully found roots [(x0,y0), ...].
 
     Raises:
-        ValueError: If pol is not bivariate, pol(0,0) == 0, or
-            gcd(pol(0,0),X*Y) != 1.
+        ValueError: If pol is not bivariate
     """
 
     if pol.nvariables() != 2:
         raise ValueError("pol is not bivariate")
 
-    if pol(0,0) == 0:
-        raise ValueError("pol(0,0) == 0 not supported (yet)")
-
-    if gcd(pol(0,0), X*Y) != 1:
-        raise ValueError("gcd(pol(0,0), X*Y) != 1 not supported (yet)")
-
     P.<x,y> = PolynomialRing(ZZ)
     pol = pol(x,y)
+
+    # Handle case where pol(0,0) == 0
+    xoffset = 0
+
+    while pol(xoffset,0) == 0:
+        xoffset += 1
+
+    pol = pol(x+xoffset,y)
+
+    # Handle case where gcd(pol(0,0),X*Y) != 1
+    while gcd(pol(0,0), X) != 1:
+        X = next_prime(X, proof=False)
+
+    while gcd(pol(0,0), Y) != 1:
+        Y = next_prime(Y, proof=False)
+
     pol = P(pol/gcd(pol.coefficients())) # seems to be helpful
-
-    delta = max(pol.degree(x),pol.degree(y)) # maximum degree of any variable
-
     p00 = pol(0,0)
+    delta = max(pol.degree(x),pol.degree(y)) # maximum degree of any variable
 
     W = max(abs(i) for i in pol(x*X,y*Y).coefficients())
     u = W + ((1-W) % abs(p00))
@@ -107,8 +114,8 @@ def coron(pol, X, Y, k=2, debug=False):
                 for y0, _ in P2(pol(x0,z)).roots():
                     if debug:
                         print "Potential y0:",y0
-                    if (x0,y0) not in roots and pol(x0,y0) == 0:
-                        roots.append((x0,y0))
+                    if (x0-xoffset,y0) not in roots and pol(x0,y0) == 0:
+                        roots.append((x0-xoffset,y0))
     return roots
 
 def main():
@@ -141,7 +148,7 @@ def main():
     # Recovery starts here
     q0 = (n * inverse_mod(p0,ln)) % ln
     assert q0 == q % ln
-    X = Y = next_prime(2^(nbits+1-lbits), proof=False) # bounds on x0 and y0
+    X = Y = 2^(nbits+1-lbits) # bounds on x0 and y0
 
     P.<x,y> = PolynomialRing(ZZ)
     pol = (ln*x+p0)*(ln*y+q0) - n # Should have a root at (x0,y0)
@@ -185,7 +192,7 @@ def main():
 
     # Recovery starts here
     q0 = floor(n / (p0*ln))//ln
-    X = Y = next_prime(2^(lbits+2), proof=False) # bounds on x0 and y0
+    X = Y = 2^(lbits+2) # bounds on x0 and y0
     P.<x,y> = PolynomialRing(ZZ)
     # Should have a root at (x0,y0) +/- some bits of q0
     pol = (x+p0*ln)*(y+q0*ln) - n
