@@ -56,7 +56,7 @@ def coron(pol, X, Y, k=2, debug=False):
     for i in range(delta+k+1):
         for j in range(delta+k+1):
             if 0 <= i <= k and 0 <= j <= k:
-                polynomials.append(polq*x^i*y^j*X^(k-i)*Y^(k-j))
+                polynomials.append(polq * x^i * y^j * X^(k-i) * Y^(k-j))
             else:
                 polynomials.append(x^i * y^j * N)
 
@@ -107,6 +107,8 @@ def coron(pol, X, Y, k=2, debug=False):
 
         if len(r.roots()) > 0:
             for x0, _ in r.roots():
+                if x0-xoffset in [i[0] for i in roots]:
+                    continue
                 if debug:
                     print "Potential x0:",x0
                 for y0, _ in P2(pol(x0,z)).roots():
