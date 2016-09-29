@@ -89,7 +89,6 @@ def coron(pol, X, Y, k=2, debug=False):
         print L.apply_map(lambda x: x.nbits()).str()
 
     roots = []
-    P2.<z> = PolynomialRing(ZZ)
 
     for i in range(L.nrows()):
         if debug:
@@ -103,7 +102,7 @@ def coron(pol, X, Y, k=2, debug=False):
         if r.is_constant(): # not independent
             continue
 
-        r = r(z,0) # convert to univariate polynomial
+        r = r.univariate_polynomial()
 
         if len(r.roots()) > 0:
             for x0, _ in r.roots():
@@ -111,7 +110,7 @@ def coron(pol, X, Y, k=2, debug=False):
                     continue
                 if debug:
                     print "Potential x0:",x0
-                for y0, _ in P2(pol(x0,z)).roots():
+                for y0, _ in pol(x0,y).univariate_polynomial().roots():
                     if debug:
                         print "Potential y0:",y0
                     if (x0-xoffset,y0) not in roots and pol(x0,y0) == 0:
