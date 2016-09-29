@@ -102,19 +102,16 @@ def coron(pol, X, Y, k=2, debug=False):
         if r.is_constant(): # not independent
             continue
 
-        r = r.univariate_polynomial()
-
-        if len(r.roots()) > 0:
-            for x0, _ in r.roots():
-                if x0-xoffset in [i[0] for i in roots]:
-                    continue
+        for x0, _ in r.univariate_polynomial().roots():
+            if x0-xoffset in [i[0] for i in roots]:
+                continue
+            if debug:
+                print "Potential x0:",x0
+            for y0, _ in pol(x0,y).univariate_polynomial().roots():
                 if debug:
-                    print "Potential x0:",x0
-                for y0, _ in pol(x0,y).univariate_polynomial().roots():
-                    if debug:
-                        print "Potential y0:",y0
-                    if (x0-xoffset,y0) not in roots and pol(x0,y0) == 0:
-                        roots.append((x0-xoffset,y0))
+                    print "Potential y0:",y0
+                if (x0-xoffset,y0) not in roots and pol(x0,y0) == 0:
+                    roots.append((x0-xoffset,y0))
     return roots
 
 def main():
