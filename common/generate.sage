@@ -19,7 +19,7 @@ while not p.is_prime(proof=False) or not q.is_prime(proof=False):
         p = 2*g*a + 1
 
     while not q.is_prime(proof=False):
-        print "try",count
+        print("try",count)
         b = randrange(2^floor(nbits*(1/2 - gamma)))
         while gcd(a,b) != 1 or not (2*g*a*b + a + b).is_prime(proof=False):
             b = randrange(2^floor(nbits*(1/2 - gamma)))
@@ -47,16 +47,16 @@ while gcd(k,2*g) != 1:
     e = inverse_mod(d, lcm)
     k = (e*d-1)/lcm
 
-n = long(n)
-e = long(e)
-d = long(d)
-p = long(p)
-q = long(q)
+n = int(n)
+e = int(e)
+d = int(d)
+p = int(p)
+q = int(q)
 
-flag = open("flag.txt").read().strip()
+flag = open("flag.txt","rb").read().strip()
 key = RSA.construct((n,e,d,p,q))
 cipher = PKCS1_OAEP.new(key)
 ciphertext = cipher.encrypt(flag)
-open("flag.enc","w").write(ciphertext)
-open("private.pem","w").write(key.exportKey())
-open("public.pem","w").write(key.publickey().exportKey())
+open("flag.enc","wb").write(ciphertext)
+open("private.pem","wb").write(key.exportKey())
+open("public.pem","wb").write(key.publickey().exportKey())
