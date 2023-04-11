@@ -66,22 +66,22 @@ def coron_trivariate(pol, X, Y, Z, l=2, debug=False):
     L = matrix(ZZ,sorted(L,reverse=True))
 
     if debug:
-        print "Bitlengths of matrix elements (before reduction):"
-        print L.apply_map(lambda x: x.nbits()).str()
+        print("Bitlengths of matrix elements (before reduction):")
+        print(L.apply_map(lambda x: x.nbits()).str())
         set_verbose(2)
 
     L = L.LLL()
 
     if debug:
-        print "Bitlengths of matrix elements (after reduction):"
-        print L.apply_map(lambda x: x.nbits()).str()
+        print("Bitlengths of matrix elements (after reduction):")
+        print(L.apply_map(lambda x: x.nbits()).str())
 
     roots = []
     P2.<q> = PolynomialRing(ZZ)
 
     for i in range(L.nrows()-1):
         for j in range(i+1,L.nrows()):
-            print "Trying rows %d, %d" % (i,j)
+            print("Trying rows {}, {}".format(i,j))
             pol2 = P(sum(map(mul, zip(L[i],monomials)))(x/X,y/Y,z/Z))
             pol3 = P(sum(map(mul, zip(L[j],monomials)))(x/X,y/Y,z/Z))
 
@@ -100,13 +100,13 @@ def coron_trivariate(pol, X, Y, Z, l=2, debug=False):
                     if x0 == 0:
                         continue
                     if debug:
-                        print "Potential x0:",x0
+                        print("Potential x0:",x0)
                     for y0, _ in P2(r2(x0,q,0)).roots():
                         if debug:
-                            print "Potential y0:",y0
+                            print("Potential y0:",y0)
                         for z0, _ in P2(pol(x0,y0,q)).roots():
                             if debug:
-                                print "Potential z0:",z0
+                                print("Potential z0:",z0)
                             if pol(x0-xoffset,y0,z0) == 0:
                                 roots += [(x0-xoffset,y0,z0)]
     return roots
@@ -127,7 +127,7 @@ pol = e^2*x^2 + e*x*(y+z-2) - (y+z-1) - (n-1)*y*z
 
 roots = coron_trivariate(pol, X, Y, Z, l=0, debug=True)
 if len(roots) > 0:
-    print '!!!'
+    print('!!!')
     x0,y0,z0 = roots[0]
     print(x0)
     print(y0)
@@ -135,4 +135,4 @@ if len(roots) > 0:
     d = int(x0)
     privkey = RSA.construct((n,e,d))
     cipher = PKCS1_OAEP.new(privkey)
-    print(cipher.decrypt(open("flag.enc").read()))
+    print(cipher.decrypt(open("flag.enc","rb").read()))
